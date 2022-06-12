@@ -1,0 +1,27 @@
+{
+  "name": "discord_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xavier-hennessy/discord_bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xavier-hennessy/discord_bot/issues"
+  },
+  "homepage": "https://github.com/xavier-hennessy/discord_bot#readme",
+  "dependencies": {
+    "@discordjs/rest": "^0.5.0",
+    "discord-api-types": "^0.33.5",
+    "discord.js": "^13.8.0",
+    "mongodb": "^4.7.0",
+    "mongoose": "^6.3.6"
+  }
+}
