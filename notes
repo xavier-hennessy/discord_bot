@@ -1,0 +1,20 @@
+NOTES FOR THE TEST DISCORD APP
+
+    for the db going to need 
+            ID
+            LABEL optional
+            ADDRESS
+            FOLLOW
+
+            label will only be used in discord side really
+
+    probably want to make entry into db when follow is true
+    then when they unsubscribe follow = false
+    dont think we need to store all transactions 
+    but we could store in a table 
+        ID
+        TRANS_ID
+        TO
+        FROM
+        VALUE
+        GAS
