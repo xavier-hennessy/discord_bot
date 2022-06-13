@@ -1,55 +1,67 @@
-// const { REST } = require('@discordjs/rest');
-// const { Routes } = require('discord-api-types/v10');
 import Discord from 'discord.js';
 
-const BOT_TOKEN = "OTg1NjgxNjg0ODYxMTgxOTgy.GCa0ak.QjYisQs9rLb9875sAtZI3GSQe57d7UZtUvxg60";
-const PUBLIC_KEY = "943fe053059dfdfa89623de1660480bc74a59ec48d5ba08ada46251ea5de10a3"
+import { DbClinet } from '../db/index.js';
 
-const client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
+import {
+    BOT_TOKEN,
+    PREFIX,
+    FOLLOW_WALLET,
+    UNFOLLOW_WALLET,
+    DB_URI,
+    GETALLWALLETS
+} from '../constants.js';
 
-const prefix = "!";
-
-client.on("messageCreate", function (message) {
-    if (message.author.bot) return;
-    if (!message.content.startsWith(prefix)) return;
-
-    const commandBody = message.content.slice(prefix.length);
-    const args = commandBody.split(' ');
-    const command = args.shift().toLowerCase();
-
-    if (command === "ping") {
-        const timeTaken = Date.now() - message.createdTimestamp;
-        message.reply(`Pong! This message had a latency of ${timeTaken}ms.`);
+export class DiscordClient {
+    constructor() {
+        this.BOT_TOKEN = BOT_TOKEN;
+        this.PREFIX = PREFIX;
+        this.client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
+        this.connectToDiscord();
+        this.listenForMessages();
+        this.dbClient = new DbClinet(DB_URI);
     }
 
-    else if (command === "sum") {
-        const numArgs = args.map(x => parseFloat(x));
-        const sum = numArgs.reduce((counter, x) => counter += x);
-        message.reply(`The sum of all the arguments you provided is ${sum}!`);
+    connectToDiscord = async () => {
+        try {
+            console.log("connectig to bot...")
+            const cxn = await this.client.login(this.BOT_TOKEN);
+            console.log("connected! bot_token:", cxn);
+        } catch (error) {
+            handleError(error);
+        }
     }
-});
+
+    listenForMessages = async () => {
+        this.client.on("messageCreate", function (message) {
+            if (message.author.bot) return;
+            if (!message.content.startsWith(PREFIX)) return;
+
+            const commandBody = message.content.slice(PREFIX.length);
+            const args = commandBody.split(' ');
+            const command = args.shift().toLowerCase();
+
+            switch (command) {
+                case FOLLOW_WALLET:
+                    message.reply(`ok, following ${args[1] ? args[1] : args[0]}..`)
+                    this.dbClient.followWallet({ address: args[0], label: args[1] });
+                    break
+                case UNFOLLOW_WALLET:
+                    message.reply(`ok, unfollowing ${args[1] ? args[1] : args[0]}..`);
+                    this.dbClient.unfollowWallet({ address: args[0], label: args[1] });
+                    break
+                case GETALLWALLETS:
+                    message.reply(`ok, getting all wallets..`);
+                    console.log(this.dbClient)
+                // this.dbClient.getAllWallets()
+                default:
+                    break
+            }
+        });
+    }
+}
 
 
-client.login(BOT_TOKEN);
 
 
-// const commands = [
-//     {
-//         name: 'ping',
-//         description: 'Replies with Pong!',
-//     },
-// ];
-
-// const rest = new REST({ version: '10' }).setToken('token');
-
-// (async () => {
-//     try {
-//         console.log('Started refreshing application (/) commands.');
-
-//         await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: commands });
-
-//         console.log('Successfully reloaded application (/) commands.');
-//     } catch (error) {
-//         console.error(error);
-//     }
-// })();
+// client.login(BOT_TOKEN);
+new DiscordClient();
