@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-export class DbClinet {
+export default class DbClinet {
     constructor(DB_URI) {
         this.DB_URI = DB_URI;
         this.SCHEMA = new Schema({
@@ -16,7 +16,7 @@ export class DbClinet {
     connectToDb = async (DB_URI) => {
         try {
             const cxn = await mongoose.connect(DB_URI);
-            console.log("connect to db! connection:", cxn);
+            console.log("connect to db! connection has opened:", cxn.connections[0]._hasOpened);
         } catch (error) {
             handleError(error);
         }
@@ -28,7 +28,7 @@ export class DbClinet {
             console.log('creating new wallet to follow..')
             const wallet = new Wallet({
                 address: address,
-                label: label,
+                label: label ? label : null,
                 follow: true,
             });
             await wallet.save();
@@ -43,7 +43,7 @@ export class DbClinet {
         }
     }
 
-    unfollowWallet = async (address, label) => {
+    unfollowWallet = async (address) => {
         console.log('unfollowing wallet..')
         await this.MODEL.updateOne({ address: address }, { $set: { follow: false } });
         const row = await this.MODEL.findOne({ address: address });

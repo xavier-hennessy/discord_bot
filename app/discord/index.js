@@ -1,6 +1,6 @@
 import Discord from 'discord.js';
 
-import { DbClinet } from '../db/index.js';
+import DbClinet from '../db/index.js';
 
 import {
     BOT_TOKEN,
@@ -16,9 +16,9 @@ export class DiscordClient {
         this.BOT_TOKEN = BOT_TOKEN;
         this.PREFIX = PREFIX;
         this.client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
-        this.connectToDiscord();
-        this.listenForMessages();
         this.dbClient = new DbClinet(DB_URI);
+        this.connectToDiscord();
+        this.listenForMessages(this.dbClient);
     }
 
     connectToDiscord = async () => {
@@ -31,7 +31,8 @@ export class DiscordClient {
         }
     }
 
-    listenForMessages = async () => {
+    listenForMessages = async (db) => {
+        console.log("listening for messages...")
         this.client.on("messageCreate", function (message) {
             if (message.author.bot) return;
             if (!message.content.startsWith(PREFIX)) return;
@@ -43,16 +44,15 @@ export class DiscordClient {
             switch (command) {
                 case FOLLOW_WALLET:
                     message.reply(`ok, following ${args[1] ? args[1] : args[0]}..`)
-                    this.dbClient.followWallet({ address: args[0], label: args[1] });
+                    db.followWallet({ address: args[0], label: args[1] });
                     break
                 case UNFOLLOW_WALLET:
                     message.reply(`ok, unfollowing ${args[1] ? args[1] : args[0]}..`);
-                    this.dbClient.unfollowWallet({ address: args[0], label: args[1] });
+                    db.unfollowWallet({ address: args[0] });
                     break
                 case GETALLWALLETS:
                     message.reply(`ok, getting all wallets..`);
-                    console.log(this.dbClient)
-                // this.dbClient.getAllWallets()
+                    db.getAllWallets()
                 default:
                     break
             }
@@ -60,8 +60,4 @@ export class DiscordClient {
     }
 }
 
-
-
-
-// client.login(BOT_TOKEN);
 new DiscordClient();
