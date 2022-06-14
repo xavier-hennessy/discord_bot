@@ -103,10 +103,17 @@ export class DiscordClient {
 
                     break
                 case FOLLOW_ALL:
-                    message.reply(`ok, following all transactions...`);
-                    console.log("in here")
+                    let value = '0x37b88f74e3b400';
+                    const utf8 = ws.web3.utils.hexToNumberString(value);
+                    // const isHex = ws.web3.utils.isHex(value);
 
-                    ws.subscribeToAllTransactions(this.channel)
+                    console.log(utf8)
+                // console.log(utf8)
+
+                // message.reply(`ok, following all transactions...`);
+                // console.log("in here")
+
+                // ws.subscribeToAllTransactions(this.channel)
                 // case REMOVE_ALL:
                 //     message.reply(`ok, following all transactions...`);
                 //     console.log("in here")
