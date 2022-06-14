@@ -8,11 +8,13 @@ import {
     PREFIX,
     FOLLOW_WALLET,
     UNFOLLOW_WALLET,
+    FOLLOW_ALL,
     DB_URI,
     GETALLWALLETS,
     WS_ADDR,
     REMOVE_WALLET
 } from '../constants.js';
+import { createAlchemyWeb3 } from '@alch/alchemy-web3';
 
 export class DiscordClient {
     constructor() {
@@ -20,6 +22,7 @@ export class DiscordClient {
         this.PREFIX = PREFIX;
         this.client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
         this.dbClient = new DbClinet(DB_URI);
+        this.channel = null;
         this.AlchemyClient = new AlchemyClient(WS_ADDR);
         this.connectToDiscord();
         this.listenForMessages(this.dbClient, this.AlchemyClient);
@@ -30,14 +33,31 @@ export class DiscordClient {
             console.log("connnecting to bot...")
             const cxn = await this.client.login(this.BOT_TOKEN);
             console.log("connected! bot_token:", cxn);
-        } catch (error) {
-            handleError(error);
+        } catch (err) {
+            handleError(err);
+        }
+    }
+
+    sendMessageToChannel = async (message) => {
+        try {
+            // this.client.on("ready", (client) => {
+            consoel.log(this.client.channels);
+            // })
+
+            //     console.log("sending message to channel...")
+            //     const msg = await channel.send(message);
+            //     console.log("message sent!");
+        } catch (err) {
+            console.log("error sending message to channel");
+            console.error(err)
         }
     }
 
     listenForMessages = (db, ws) => {
         console.log("listening for messages...")
         this.client.on("messageCreate", async (message) => {
+            this.channel = await this.client.channels.fetch(message.channelId);
+
             if (message.author.bot) return;
             if (!message.content.startsWith(PREFIX)) return;
 
@@ -45,8 +65,14 @@ export class DiscordClient {
             const args = commandBody.split(' ');
             const command = args.shift().toLowerCase();
 
+            console.log(command)
+            console.log(args)
+
             switch (command) {
                 case FOLLOW_WALLET:
+                    if (args.length > 0) {
+                        message.reply("no agrs. please use !followwallet <address> <label>");
+                    }
                     message.reply(`ok, following ${args[1] ? args[1] : args[0]}..`)
                     const follow = await db.followWallet({ address: args[0], label: args[1] });
                     ws.subscribeToFilteredTransactions(follow);
@@ -59,21 +85,32 @@ export class DiscordClient {
                     break
                 case REMOVE_WALLET:
                     const remove = await db.removeWallet(args[0]);
+                    ws.unsubscribeFromAllTransactions();
                     if (remove !== args[0]) {
                         message.reply(`ok, removed ${args[1] ? args[1] : args[0]} delete count: ${remove.deletedCount}`);
                     } else {
                         message.reply(`wallet ${args[0]} does not exist..`);
                     }
-                    console.log(remove)
+                    // console.log(remove)
                     break
                 case GETALLWALLETS:
                     const wallets = await db.getAllWallets()
                     message.reply(`ok, found ${wallets.length} wallets..`);
-                    // ws.subscribeToFilteredTransactions(wallets.filter(w => w.follow === true));
                     wallets.forEach((w) => {
                         message.reply(`address: ${w.address}, label: ${w.label ? w.label : ''}, following: ${w.follow}`);
                     })
-                // console.log("wallets: ", wallets)
+
+                    break
+                case FOLLOW_ALL:
+                    message.reply(`ok, following all transactions...`);
+                    console.log("in here")
+
+                    ws.subscribeToAllTransactions(this.channel)
+                // case REMOVE_ALL:
+                //     message.reply(`ok, following all transactions...`);
+                //     console.log("in here")
+                //     ws.subscribeToAllTransactions(this.channel)
+                //     break
                 default:
                     break
             }
