@@ -1,6 +1,6 @@
 version: "2.1"
 services:
-  app:
+  discord_bot:
     platform: linux/amd64
     container_name: discord_bot
     restart: always
@@ -11,6 +11,3 @@ services:
       - ./app-variables.env
     volumes:
       - ./app:/app_home/app
-  db:
-
-
