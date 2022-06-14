@@ -1,31 +1,24 @@
 import Discord from 'discord.js';
 
-import DbClinet from '../db/index.js';
-import AlchemyClient from '../alchemy/index.js';
-
 import {
-    BOT_TOKEN,
-    PREFIX,
     FOLLOW_WALLET,
     UNFOLLOW_WALLET,
     FOLLOW_ALL,
-    DB_URI,
     GETALLWALLETS,
-    WS_ADDR,
     REMOVE_WALLET
 } from '../constants.js';
-import { createAlchemyWeb3 } from '@alch/alchemy-web3';
 
-export class DiscordClient {
-    constructor() {
+export default class DiscordClient {
+    constructor(BOT_TOKEN, PREFIX) {
         this.BOT_TOKEN = BOT_TOKEN;
         this.PREFIX = PREFIX;
         this.client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
-        this.dbClient = new DbClinet(DB_URI);
         this.channel = null;
-        this.AlchemyClient = new AlchemyClient(WS_ADDR);
+    }
+
+    init(dbClient, alchemyClient) {
         this.connectToDiscord();
-        this.listenForMessages(this.dbClient, this.AlchemyClient);
+        this.listenForMessages(dbClient, alchemyClient);
     }
 
     connectToDiscord = async () => {
@@ -38,30 +31,15 @@ export class DiscordClient {
         }
     }
 
-    sendMessageToChannel = async (message) => {
-        try {
-            // this.client.on("ready", (client) => {
-            consoel.log(this.client.channels);
-            // })
-
-            //     console.log("sending message to channel...")
-            //     const msg = await channel.send(message);
-            //     console.log("message sent!");
-        } catch (err) {
-            console.log("error sending message to channel");
-            console.error(err)
-        }
-    }
-
     listenForMessages = (db, ws) => {
         console.log("listening for messages...")
         this.client.on("messageCreate", async (message) => {
             this.channel = await this.client.channels.fetch(message.channelId);
 
             if (message.author.bot) return;
-            if (!message.content.startsWith(PREFIX)) return;
+            if (!message.content.startsWith(this.PREFIX)) return;
 
-            const commandBody = message.content.slice(PREFIX.length);
+            const commandBody = message.content.slice(this.PREFIX.length);
             const args = commandBody.split(' ');
             const command = args.shift().toLowerCase();
 
@@ -92,7 +70,7 @@ export class DiscordClient {
                     } else {
                         message.reply(`wallet ${args[0]} does not exist..`);
                     }
-                    // console.log(remove)
+                    console.log(remove)
                     break
                 case GETALLWALLETS:
                     const wallets = await db.getAllWallets()
@@ -103,22 +81,14 @@ export class DiscordClient {
 
                     break
                 case FOLLOW_ALL:
-                    let value = '0x37b88f74e3b400';
-                    const utf8 = ws.web3.utils.hexToNumberString(value);
-                    // const isHex = ws.web3.utils.isHex(value);
-
-                    console.log(utf8)
-                // console.log(utf8)
-
-                // message.reply(`ok, following all transactions...`);
-                // console.log("in here")
-
-                // ws.subscribeToAllTransactions(this.channel)
-                // case REMOVE_ALL:
-                //     message.reply(`ok, following all transactions...`);
-                //     console.log("in here")
-                //     ws.subscribeToAllTransactions(this.channel)
-                //     break
+                    message.reply(`ok, following all transactions...`);
+                    ws.subscribeToAllTransactions(this.channel)
+                    break
+                case REMOVE_ALL:
+                    message.reply(`ok, following all transactions...`);
+                    console.log("in here")
+                    ws.unsubscribeToAllTransactions(this.channel)
+                    break
                 default:
                     break
             }
@@ -126,4 +96,4 @@ export class DiscordClient {
     }
 }
 
-new DiscordClient();
+// new DiscordClient();

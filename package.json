@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app/discord/index.js"
+    "start": "nodemon app/index.js"
   },
   "repository": {
     "type": "git",

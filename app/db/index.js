@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
-export default class DbClinet {
+export default class DbClient {
     constructor(DB_URI) {
         this.DB_URI = DB_URI;
         this.SCHEMA = new Schema({
@@ -10,7 +10,11 @@ export default class DbClinet {
             follow: Boolean,
         });
         this.MODEL = mongoose.model('Wallet', this.SCHEMA);
-        this.connectToDb(DB_URI)
+        this.init()
+    }
+
+    init() {
+        this.connectToDb(this.DB_URI);
     }
 
     connectToDb = async (DB_URI) => {
@@ -97,9 +101,3 @@ export default class DbClinet {
         }
     }
 }
-
-// import { DB_URI } from '../constants.js';
-
-// const db = new DbClinet(DB_URI);
-
-// db.getAllWallets();

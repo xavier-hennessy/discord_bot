@@ -18,3 +18,17 @@ NOTES FOR THE TEST DISCORD APP
         FROM
         VALUE
         GAS
+
+    possible commands 
+        !getall
+        !remove
+        !whoFollowing
+        !o
+
+    TODO STILL
+        put it in docker 
+        get it following on startup
+        unsubscribe
+        better error handling 
+
+
