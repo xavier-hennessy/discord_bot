@@ -5,16 +5,26 @@ import DbClinet from '../db/index.js';
 
 import {
     OWNER_ADDR,
-    FILTERED_BY_OWNER,
     ALL_TRANSACTIONS,
+    FILTERED_BY_ADDR,
 } from "../constants.js"
 
 export default class AlchemyClient {
     constructor(WS_ADDR) {
         this.OWNER_ADDR = [];
-        this.web3 = createAlchemyWeb3(WS_ADDR);
-        // this.subscribeToAllTransactions();
-        // this.subscribeToFilteredTransactions()
+        // this.web3 = this.connectToAlchemy(WS_ADDR);
+        this.web3 = new createAlchemyWeb3(WS_ADDR);
+    }
+
+    connectToAlchemy = async (WS_ADDR) => {
+        try {
+            console.log("connecting to alchemy...")
+            const web3 = new createAlchemyWeb3(WS_ADDR);
+            console.log(web3._provider.ws.url, "connected!");
+            return web3;
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     subscribeToAllTransactions = async () => {
@@ -30,14 +40,13 @@ export default class AlchemyClient {
         }
     }
 
-    subscribeToFilteredTransactions = async (wallets) => {
+    subscribeToFilteredTransactions = async (w) => {
         try {
-            console.log("wallets: ", wallets)
-            // console.log("subscribing to filtered transactions");
-            // this.web3.eth.subscribe(FILTERED_BY_OWNER, { owner: this.OWNER_ADDR })
-            //     .on("data", (data) => {
-            //         console.log(data);
-            //     })
+            console.log("subscribing to filtered transactions");
+            this.web3.eth.subscribe(FILTERED_BY_ADDR, { address: w.address })
+                .on("data", (data) => {
+                    console.log(`${w.address} :`, data);
+                })
         } catch (error) {
             console.log("error subscribing to filtered transactions");
             console.error(error);

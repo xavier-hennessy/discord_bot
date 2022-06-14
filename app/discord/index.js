@@ -19,7 +19,6 @@ export class DiscordClient {
         this.BOT_TOKEN = BOT_TOKEN;
         this.PREFIX = PREFIX;
         this.client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
-        console.log("wsaddr", WS_ADDR);
         this.dbClient = new DbClinet(DB_URI);
         this.AlchemyClient = new AlchemyClient(WS_ADDR);
         this.connectToDiscord();
@@ -28,7 +27,7 @@ export class DiscordClient {
 
     connectToDiscord = async () => {
         try {
-            console.log("connectig to bot...")
+            console.log("connnecting to bot...")
             const cxn = await this.client.login(this.BOT_TOKEN);
             console.log("connected! bot_token:", cxn);
         } catch (error) {
@@ -50,6 +49,7 @@ export class DiscordClient {
                 case FOLLOW_WALLET:
                     message.reply(`ok, following ${args[1] ? args[1] : args[0]}..`)
                     const follow = await db.followWallet({ address: args[0], label: args[1] });
+                    ws.subscribeToFilteredTransactions(follow);
                     console.log(follow);
                     break
                 case UNFOLLOW_WALLET:
@@ -67,9 +67,9 @@ export class DiscordClient {
                     console.log(remove)
                     break
                 case GETALLWALLETS:
-                    message.reply(`ok, getting all wallets..`);
                     const wallets = await db.getAllWallets()
-                    ws.subscribeToFilteredTransactions(wallets.filter(w => w.follow === ture));
+                    message.reply(`ok, found ${wallets.length} wallets..`);
+                    // ws.subscribeToFilteredTransactions(wallets.filter(w => w.follow === true));
                     wallets.forEach((w) => {
                         message.reply(`address: ${w.address}, label: ${w.label ? w.label : ''}, following: ${w.follow}`);
                     })

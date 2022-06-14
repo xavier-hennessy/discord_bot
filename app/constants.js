@@ -8,5 +8,5 @@ export const FOLLOW_WALLET = "followwallet";
 export const UNFOLLOW_WALLET = "unfollowwallet";
 export const GETALLWALLETS = "getall";
 export const REMOVE_WALLET = "removewallet";
-export const FILTERED_BY_OWNER = "alchemy_filteredNewFullPendingTransactions";
+export const FILTERED_BY_ADDR = "alchemy_filteredNewFullPendingTransactions";
 export const ALL_TRANSACTIONS = "alchemy_newFullPendingTransactions";
