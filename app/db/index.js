@@ -21,8 +21,8 @@ export default class DbClient {
         try {
             const cxn = await mongoose.connect(DB_URI);
             console.log("connect to db! connection has opened:", cxn.connections[0]._hasOpened);
-        } catch (error) {
-            handleError(error);
+        } catch (err) {
+            console.error(err);
         }
     }
 
@@ -47,9 +47,9 @@ export default class DbClient {
                 console.log(`row for ${address} already exists and is being followed`);
                 return row;
             }
-        } catch (error) {
+        } catch (err) {
             console.log('error following wallet..')
-            console.error(error);
+            console.error(err);
         }
     }
 
@@ -64,9 +64,9 @@ export default class DbClient {
                 await this.MODEL.updateOne({ address: id }, { $set: { follow: false } });
                 return await this.MODEL.findOne({ address: id });
             }
-        } catch (error) {
+        } catch (err) {
             console.log('error unfollowing wallet..')
-            console.error(error);
+            console.error(err);
         }
     }
 
@@ -85,9 +85,9 @@ export default class DbClient {
             } else {
                 return await this.MODEL.deleteOne({ address: id });
             }
-        } catch (error) {
+        } catch (err) {
             console.log('error removing wallet..')
-            console.error(error);
+            console.error(err);
         }
     }
 
@@ -95,9 +95,9 @@ export default class DbClient {
         try {
             const wallets = await this.MODEL.find({});
             return wallets
-        } catch (error) {
+        } catch (err) {
             console.log('error getting all wallets..')
-            console.error(error);
+            console.error(err);
         }
     }
 }
