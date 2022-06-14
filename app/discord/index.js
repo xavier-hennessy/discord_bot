@@ -68,14 +68,15 @@ export class DiscordClient {
             console.log(command)
             console.log(args)
 
+            // if (args.length < 0) {
+            //     message.reply("no agrs. please use !followwallet <address> <label>");
+            // }
+
             switch (command) {
                 case FOLLOW_WALLET:
-                    if (args.length > 0) {
-                        message.reply("no agrs. please use !followwallet <address> <label>");
-                    }
                     message.reply(`ok, following ${args[1] ? args[1] : args[0]}..`)
                     const follow = await db.followWallet({ address: args[0], label: args[1] });
-                    ws.subscribeToFilteredTransactions(follow);
+                    ws.subscribeToFilteredTransactions(this.channel, follow);
                     console.log(follow);
                     break
                 case UNFOLLOW_WALLET:
