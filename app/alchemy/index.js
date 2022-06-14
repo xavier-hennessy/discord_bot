@@ -1,10 +1,6 @@
 import { createAlchemyWeb3 } from "@alch/alchemy-web3";
-import { TeamMemberMembershipState, ThreadAutoArchiveDuration } from "discord-api-types/v10";
-
-import DbClinet from '../db/index.js';
 
 import {
-    OWNER_ADDR,
     ALL_TRANSACTIONS,
     FILTERED_BY_ADDR,
 } from "../constants.js"

@@ -1,0 +1,16 @@
+version: "2.1"
+services:
+  app:
+    platform: linux/amd64
+    container_name: discord_bot
+    restart: always
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./app-variables.env
+    volumes:
+      - ./app:/app_home/app
+  db:
+
+
