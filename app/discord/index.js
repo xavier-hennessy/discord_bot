@@ -15,14 +15,20 @@ export default class DiscordClient {
         this.client = new Discord.Client({ intents: ["GUILDS", "GUILD_MESSAGES"] });
         this.dbClient = null;
         this.alchemyClient = null;
+        this.channelId = "985683413405159467";
         this.channel = null;
     }
 
-    init(dbClient, alchemyClient) {
-        this.connectToDiscord();
+    init = async (dbClient, alchemyClient) => {
+        await this.connectToDiscord();
         this.listenForMessages();
         this.dbClient = dbClient;
         this.alchemyClient = alchemyClient;
+        this.followExistingWallets();
+        // console.log(this.client.actions)
+        if (this.channelId) {
+            this.channel = await this.client.channels.fetch(this.channelId);
+        }
     }
 
     connectToDiscord = async () => {
@@ -31,7 +37,22 @@ export default class DiscordClient {
             const cxn = await this.client.login(this.BOT_TOKEN);
             console.log("connected! bot_token:", cxn);
         } catch (err) {
-            handleError(err);
+            console.error(err)
+        }
+    }
+
+    followExistingWallets = async () => {
+        console.log("following existing wallets...");
+        try {
+            const wallets = await this.dbClient.getAllWallets();
+            wallets.forEach(async (w) => {
+                if (w.follow) {
+                    await this.alchemyClient.subscribeToFilteredTransactions(this.channel, w);
+                }
+            })
+        } catch (err) {
+            conosle.log('error following existing wallets..')
+            console.error(err);
         }
     }
 
@@ -39,6 +60,7 @@ export default class DiscordClient {
         console.log("listening for messages...")
         this.client.on("messageCreate", async (message) => {
             this.channel = await this.client.channels.fetch(message.channelId);
+            console.log(message.channelId)
 
             if (message.author.bot) return;
             if (!message.content.startsWith(this.PREFIX)) return;
@@ -82,7 +104,6 @@ export default class DiscordClient {
                     wallets.forEach((w) => {
                         message.reply(`address: ${w.address}, label: ${w.label ? w.label : ''}, following: ${w.follow}`);
                     })
-
                     break
                 case FOLLOW_ALL:
                     message.reply(`ok, following all transactions...`);

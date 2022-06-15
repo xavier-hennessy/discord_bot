@@ -49,11 +49,15 @@ export default class AlchemyClient {
 
     subscribeToFilteredTransactions = async (ch, w) => {
         try {
-            console.log("subscribing to filtered transactions");
+            console.log(`subscribing to ${w.label ? w.label : w.address}`);
             this.web3.eth.subscribe(FILTERED_BY_ADDR, { address: w.address })
                 .on("data", (data) => {
-                    ch.send(`${data.from === w.address ? w.label : data.from} sent ${this.web3.utils.hexToUtf8(data.value)} to ${data.to === w.address ? w.label : data.to}`);
-                    console.log(`${w.label ? w.label : w.address} :`, data);
+                    ch.send(`${data.from === w.address ? w.label : data.from} sent ${data.value} to ${data.to === w.address ? w.label : data.to}`);
+                    console.log(`${w.label ? w.label : w.address} :`, {
+                        from: data.from,
+                        to: data.to,
+                        value: data.value
+                    });
                 })
         } catch (error) {
             console.log("error subscribing to filtered transactions");

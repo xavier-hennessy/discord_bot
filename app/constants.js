@@ -3,6 +3,7 @@ import { } from 'dotenv/config'
 export const DB_URI = process.env.DB_URI
 export const BOT_TOKEN = process.env.BOT_TOKEN
 export const WS_ADDR = process.env.WS_ADDR
+
 export const PREFIX = "!";
 export const FOLLOW_WALLET = "followwallet";
 export const UNFOLLOW_WALLET = "unfollowwallet";
