@@ -69,6 +69,8 @@ export default class AlchemyClient {
         console.log(`unsubscribing from ${w.label ? w.label : w.address}`);
         if (this.subs[w.address]) {
             this.subs[w.address].unsubscribe((succ, err) => {
+                // it throws an error here but it still unsubscribes
+                // why..?
                 if (succ) {
                     console.log(succ)
                     ch.send(`unsubscribed from ${w.label ? w.label : w.address}`);

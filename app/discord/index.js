@@ -89,7 +89,9 @@ export default class DiscordClient {
                     break
                 case REMOVE_WALLET:
                     const remove = await this.dbClient.removeWallet(args[0]);
-                    this.alchemyClient.unsubscribeFromFilteredTransactions(this.channel, remove);
+                    if (remove) {
+                        this.alchemyClient.unsubscribeFromFilteredTransactions(this.channel, remove);
+                    }
                     if (remove !== args[0]) {
                         message.reply(`ok, removed ${remove.label ? remove.label : remove.address}..`);
                     } else {
