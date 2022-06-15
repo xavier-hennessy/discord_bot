@@ -64,4 +64,14 @@ export default class AlchemyClient {
             console.error(error);
         }
     }
+
+    unsubscribeFromFilteredTransactions = async (ch, w) => {
+        try {
+            console.log(`unsubscribing from ${w.label ? w.label : w.address}`);
+            this.web3.eth.unsubscribe({ address: w.address })
+                .on("data", (data) => {
+                    // ch.send(`${data.from === w.address ? w.label : data.from} sent ${data.value} to ${data.to === w.address ? w.label : data.to}`);
+                    console.log(data)
+                }
+    }
 }

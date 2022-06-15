@@ -60,7 +60,6 @@ export default class DiscordClient {
         console.log("listening for messages...")
         this.client.on("messageCreate", async (message) => {
             this.channel = await this.client.channels.fetch(message.channelId);
-            console.log(message.channelId)
 
             if (message.author.bot) return;
             if (!message.content.startsWith(this.PREFIX)) return;
