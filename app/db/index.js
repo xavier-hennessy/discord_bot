@@ -80,10 +80,12 @@ export default class DbClient {
                     console.log(`row for ${id} does not exist`);
                     return id
                 } else {
-                    return await this.MODEL.deleteOne({ label: id });
+                    await this.MODEL.deleteOne({ label: id });
+                    return lab;
                 }
             } else {
-                return await this.MODEL.deleteOne({ address: id });
+                await this.MODEL.deleteOne({ address: id });
+                return addr
             }
         } catch (err) {
             console.log('error removing wallet..')

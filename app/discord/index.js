@@ -24,11 +24,10 @@ export default class DiscordClient {
         this.listenForMessages();
         this.dbClient = dbClient;
         this.alchemyClient = alchemyClient;
-        this.followExistingWallets();
-        // console.log(this.client.actions)
         if (this.channelId) {
             this.channel = await this.client.channels.fetch(this.channelId);
         }
+        this.followExistingWallets();
     }
 
     connectToDiscord = async () => {
@@ -85,13 +84,14 @@ export default class DiscordClient {
                 case UNFOLLOW_WALLET:
                     message.reply(`ok, unfollowing ${args[1] ? args[1] : args[0]}..`);
                     const unfollow = await this.dbClient.unfollowWallet(args[0]);
+                    this.alchemyClient.unsubscribeFromFilteredTransactions(this.channel, unfollow);
                     console.log(unfollow)
                     break
                 case REMOVE_WALLET:
                     const remove = await this.dbClient.removeWallet(args[0]);
-                    this.alchemyClient.unsubscribeFromAllTransactions();
+                    this.alchemyClient.unsubscribeFromFilteredTransactions(this.channel, remove);
                     if (remove !== args[0]) {
-                        message.reply(`ok, removed ${args[1] ? args[1] : args[0]} delete count: ${remove.deletedCount}`);
+                        message.reply(`ok, removed ${remove.label ? remove.label : remove.address}..`);
                     } else {
                         message.reply(`wallet ${args[0]} does not exist..`);
                     }
