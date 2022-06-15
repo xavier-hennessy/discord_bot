@@ -70,10 +70,6 @@ export default class DiscordClient {
             console.log(command)
             console.log(args)
 
-            // if (args.length < 0) {
-            //     message.reply("no agrs. please use !followwallet <address> <label>");
-            // }
-
             switch (command) {
                 case FOLLOW_WALLET:
                     message.reply(`ok, following ${args[1] ? args[1] : args[0]}..`)
